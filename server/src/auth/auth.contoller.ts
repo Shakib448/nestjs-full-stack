@@ -21,7 +21,7 @@ export class AuthController {
         httpOnly: true,
         secure: false,
         sameSite: 'lax',
-        expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+        expires: new Date(15 * 60 * 1000),
       })
       .send({ status: 'ok' });
   }
