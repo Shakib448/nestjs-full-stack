@@ -9,15 +9,13 @@ export class AuthService {
 
   async signUp(dto: AuthDto) {
     try {
-      const salt = await bcrypt.genSaltSync(10);
-      const hash = await bcrypt.hashSync(dto.password, salt);
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(dto.password, salt);
 
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
           password: hash,
-          firstName: dto.firstName,
-          lastName: dto.lastName,
         },
       });
 
@@ -31,7 +29,22 @@ export class AuthService {
     }
   }
 
-  signIn() {
-    return { message: "I'm signIn up" };
+  async signIn(dto: AuthDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user) throw new ForbiddenException('Credentials incorrect');
+
+    const passwordMatch = await bcrypt.compare(dto.password, user.password);
+
+    if (!passwordMatch) {
+      throw new ForbiddenException('Credentials incorrect');
+    }
+
+    delete user.password;
+    return user;
   }
 }
