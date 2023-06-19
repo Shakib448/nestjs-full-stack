@@ -1,6 +1,7 @@
 import { AuthService } from './auth.service';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthDto } from './dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +13,16 @@ export class AuthController {
   }
 
   @Post('signIn')
-  signIn(@Body() dto: AuthDto) {
-    return this.authService.signIn(dto);
+  async signIn(@Body() dto: AuthDto, @Res() res: Response) {
+    const { access_token } = await this.authService.signIn(dto);
+
+    res
+      .cookie('Authorization', access_token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
+      })
+      .send({ status: 'ok' });
   }
 }
