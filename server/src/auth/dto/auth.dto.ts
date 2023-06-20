@@ -14,12 +14,4 @@ export class AuthDto {
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  @IsString()
-  @IsOptional()
-  firstName: string;
-
-  @IsString()
-  @IsOptional()
-  lastName: string;
 }
